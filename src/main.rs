@@ -1,28 +1,31 @@
 #![no_std]
 #![no_main]
 
+mod usb;
+
 use embassy_executor::Spawner;
 use embassy_rp::bind_interrupts;
 use embassy_rp::i2c::{self, Config, InterruptHandler as I2CInterruptHandler};
-use embassy_rp::peripherals::I2C0;
+use embassy_rp::peripherals::I2C1;
 use embassy_time::{Delay, Duration, Ticker};
 use icm20948_async::*;
-use {defmt_rtt as _, panic_probe as _};
+use panic_probe as _;
 
 bind_interrupts!(struct Irqs {
-    I2C0_IRQ => I2CInterruptHandler<I2C0>;
+    I2C1_IRQ => I2CInterruptHandler<I2C1>;
 });
 
 #[embassy_executor::main]
-async fn main(_spawner: Spawner) {
+async fn main(spawner: Spawner) {
     let p = embassy_rp::init(Default::default());
+    spawner.must_spawn(usb::usb_setup(p.USB));
 
     // IMU via i2c
-    let sda = p.PIN_0;
-    let scl = p.PIN_1;
+    let sda = p.PIN_2;
+    let scl = p.PIN_3;
 
-    defmt::info!("set up i2c ");
-    let i2c = i2c::I2c::new_async(p.I2C0, scl, sda, Irqs, Config::default());
+    log::info!("set up i2c ");
+    let i2c = i2c::I2c::new_async(p.I2C1, scl, sda, Irqs, Config::default());
 
     let imu_result = Icm20948::new_i2c_from_cfg(
         i2c,
@@ -48,13 +51,13 @@ async fn main(_spawner: Spawner) {
 
     let mut imu_ticker = Ticker::every(Duration::from_hz(1000));
 
-    defmt::info!("Format Acc(vec3) Gyr(vec3) Mag(vec3)");
+    log::info!("Format Acc(vec3) Gyr(vec3) Mag(vec3)");
     loop {
         let Ok(measurement) = imu.read_9dof().await else {
             continue;
         };
 
-        defmt::info!(
+        log::info!(
             "{}, {}, {}, {}, {}, {}, {}, {}, {}",
             measurement.acc.x,
             measurement.acc.y,
