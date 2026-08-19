@@ -1,23 +1,27 @@
 use embassy_futures::join::join;
-use embassy_rp::peripherals::USB;
-use embassy_rp::usb::{Driver, InterruptHandler};
-use embassy_rp::bind_interrupts;
-use embassy_usb::class::cdc_acm::{CdcAcmClass, State};
-use embassy_usb::{Builder, Config};
+use embassy_rp::{
+    Peri, bind_interrupts,
+    peripherals::USB,
+    usb::{Driver, InterruptHandler},
+};
+use embassy_usb::{
+    class::cdc_acm::{CdcAcmClass, State},
+    {Builder, Config},
+};
 
 bind_interrupts!(struct Irqs {
     USBCTRL_IRQ => InterruptHandler<USB>;
 });
 
 #[embassy_executor::task]
-pub async fn usb_setup(p: embassy_rp::peripherals::USB) {
+pub async fn usb_setup(p: Peri<'static, USB>) {
     let driver = Driver::new(p, Irqs);
 
-    let mut config = Config::new(0xc0de, 0xcafe);
+    let mut config = Config::new(0xbaba, 0xdead);
     config.manufacturer = Some("Embassy");
-    config.product = Some("USB-serial console");
-    config.serial_number = Some("0xC0DECAFE");
-    config.max_power = 100;
+    config.product = Some("ICM20948 Dump");
+    config.serial_number = Some("0xBABADEAD");
+    config.max_power = 250;
     config.max_packet_size_0 = 64;
 
     let mut config_descriptor = [0; 256];
