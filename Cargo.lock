@@ -308,6 +308,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d0d3b15c9d7dc4fec1d8cb77112472fb008b3b28c51ad23838d83587a6d2f1e"
 dependencies = [
  "cordyceps",
+ "cortex-m",
  "critical-section",
  "document-features",
  "embassy-executor-macros",
@@ -387,8 +388,6 @@ dependencies = [
  "critical-section",
  "document-features",
  "embassy-embedded-hal",
- "embassy-executor",
- "embassy-executor-macros",
  "embassy-futures",
  "embassy-hal-internal 0.5.0",
  "embassy-sync",
@@ -735,14 +734,12 @@ dependencies = [
  "cortex-m-rt",
  "embassy-embedded-hal",
  "embassy-executor",
- "embassy-futures",
  "embassy-rp",
  "embassy-time",
- "embassy-usb",
- "embassy-usb-logger",
  "icm20948-async",
  "log",
  "panic-probe",
+ "usb_console",
 ]
 
 [[package]]
@@ -1399,6 +1396,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 
 [[package]]
+name = "static_cell"
+version = "2.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0530892bb4fa575ee0da4b86f86c667132a94b74bb72160f58ee5a4afec74c23"
+dependencies = [
+ "portable-atomic",
+]
+
+[[package]]
 name = "string_cache"
 version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1570,6 +1576,19 @@ checksum = "98816b1accafbb09085168b90f27e93d790b4bfa19d883466b5e53315b5f06a6"
 dependencies = [
  "heapless 0.8.0",
  "portable-atomic",
+]
+
+[[package]]
+name = "usb_console"
+version = "0.1.0"
+dependencies = [
+ "embassy-executor",
+ "embassy-futures",
+ "embassy-rp",
+ "embassy-usb",
+ "embassy-usb-logger",
+ "log",
+ "static_cell",
 ]
 
 [[package]]

@@ -1,8 +1,6 @@
 #![no_std]
 #![no_main]
 
-mod usb;
-
 use embassy_executor::Spawner;
 use embassy_rp::{
     bind_interrupts,
@@ -17,13 +15,10 @@ bind_interrupts!(struct Irqs {
     I2C0_IRQ => I2CInterruptHandler<I2C0>;
 });
 
-#[embassy_executor::main(
-    executor = "embassy_rp::executor::Executor",
-    entry = "cortex_m_rt::entry"
-)]
+#[embassy_executor::main]
 async fn main(spawner: Spawner) {
     let p = embassy_rp::init(Default::default());
-    spawner.spawn(usb::usb_setup(p.USB).unwrap());
+    spawner.spawn(usb_console::usb_setup(p.USB, Default::default()).unwrap());
 
     // IMU via i2c
     let sda = p.PIN_12;
